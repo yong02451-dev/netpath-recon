@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recon Console</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <b class="brand">◈ RECON</b>
+    <button type="button" class="navlink" id="nav-recon">▢ Recon</button>
+  </nav>
+
+  <main class="wrap">
+
+    <section id="view-start" class="view">
+      <div class="panel center">
+        <h1>RECON CONSOLE</h1>
+        <p class="m lead">Choose what to run, enter a target, get structured results</p>
+
+        <div class="modes" role="group" aria-label="What to run">
+          <button type="button" class="mode sel" data-mode="full">
+            <b><span class="glyph">◉</span> Full recon</b>
+            <span class="m block">Every recon module on the destination</span>
+          </button>
+          <button type="button" class="mode" data-mode="path">
+            <b><span class="glyph">○</span> Network path + recon</b>
+            <span class="m block">Trace each hop, then full recon</span>
+          </button>
+          <button type="button" class="mode" data-mode="individual">
+            <b><span class="glyph">○</span> Individual modules</b>
+            <span class="m block">Pick only the checks you need</span>
+          </button>
+        </div>
+
+        <p id="path-note" class="m hidden">The network path sends probes (traceroute, TCP, TLS) to the target whatever the Active checks switch says. The switch controls only the recon modules.</p>
+
+        <form id="run-form" novalidate>
+          <div class="target-box">
+            <span class="pre">https://</span>
+            <input id="target" type="text" placeholder="example.com or IPv4" autocomplete="off" aria-label="Target">
+          </div>
+          <button type="submit" class="btn run">▶ Run recon</button>
+          <label class="active-row">
+            <input type="checkbox" id="active" role="switch">
+            <span>
+              <b id="active-label" class="ta">Active checks: OFF</b><br>
+              <span class="m">Off uses only third-party and public-record sources. On also contacts the target directly. Use it only on targets you are authorized to test.</span>
+            </span>
+          </label>
+          <p id="form-error" class="err" role="alert"></p>
+        </form>
+      </div>
+
+      <section id="module-section" class="dim">
+        <h2><span class="dot g"></span>Modules <span class="m">used in Individual modules mode</span></h2>
+        <div class="scroll">
+          <table class="t">
+            <thead><tr><th>Use</th><th>Module</th><th>Description</th><th>Source</th><th>Tier</th></tr></thead>
+            <tbody id="module-rows"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="view-results" class="view hidden">
+      <div class="panel head">
+        <div>
+          <h1 id="result-target"></h1>
+          <div class="m"><span id="result-mode"></span> · <span id="run-status" class="running"></span></div>
+        </div>
+        <div class="head-right">
+          <span id="result-active"></span>
+          <button type="button" class="btn small" id="new-run">New run</button>
+        </div>
+      </div>
+
+      <div id="path-section" class="view hidden">
+        <section>
+          <h2><span class="dot g"></span>Network path</h2>
+          <div class="graph-wrap">
+            <div id="graph" class="panel"></div>
+            <div class="panel">
+              <h3>Node details</h3>
+              <dl id="node-detail"></dl>
+            </div>
+          </div>
+          <p class="m">Traceroute is a point-in-time approximation. Silent routers appear as dashed nodes, and the route your HTTP request took may differ slightly.</p>
+        </section>
+
+        <section>
+          <h2><span class="dot g"></span>Hops</h2>
+          <div class="scroll">
+            <table class="t">
+              <thead><tr><th>#</th><th>IP</th><th>RTT (ms)</th><th>Location</th><th>ASN</th><th>Note</th></tr></thead>
+              <tbody id="hop-rows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2><span class="dot g"></span>Connection</h2>
+          <div class="grid">
+            <div class="panel"><h3>DNS</h3><dl id="dns-body"></dl></div>
+            <div class="panel"><h3>TCP</h3><dl id="tcp-body"></dl></div>
+            <div class="panel"><h3>TLS</h3><dl id="tls-body"></dl></div>
+            <div class="panel"><h3>HTTP</h3><dl id="http-body"></dl></div>
+          </div>
+        </section>
+      </div>
+
+      <section>
+        <h2><span class="dot g"></span>Modules</h2>
+        <div class="scroll">
+          <table class="t">
+            <thead><tr><th>Module</th><th>Status</th><th>Source</th><th>Tier</th><th>Note</th></tr></thead>
+            <tbody id="result-modules"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2><span class="dot g"></span>Observations <span class="m">facts only, no severity ratings</span></h2>
+        <div class="scroll">
+          <table class="t">
+            <thead><tr><th>Observation</th><th>Category</th><th>Evidence</th><th>Source</th><th>Tier</th></tr></thead>
+            <tbody id="result-observations"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2><span class="dot g"></span>Raw data</h2>
+        <div id="raw-data"></div>
+      </section>
+    </section>
+
+    <div class="foot">Passive by default · opt-in active checks · use only on targets you are authorized to test</div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.2/cytoscape.min.js"></script>
+  <script src="/static/path.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
